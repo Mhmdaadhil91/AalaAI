@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AalaAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#050a14;color:#fff;min-height:100vh;overflow-x:hidden}
+canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.app{position:relative;z-index:1;min-height:100vh}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 2.5rem;backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.07)}
+.logo{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,#7DF9FF,#4F8BFF,#B57BFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff;padding:0.5rem 1.2rem;border-radius:50px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;transition:all 0.3s}
+.btn-outline:hover{border-color:#7DF9FF;color:#7DF9FF}
+.btn-primary{background:linear-gradient(135deg,#4F8BFF,#B57BFF);border:none;color:#fff;padding:0.5rem 1.4rem;border-radius:50px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:500;transition:all 0.3s}
+section{display:none}
+section.active{display:block}
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
+.badge{display:inline-block;background:rgba(79,139,255,0.15);border:1px solid rgba(79,139,255,0.3);color:#7DF9FF;font-size:0.78rem;padding:0.35rem 1rem;border-radius:50px;margin-bottom:1.5rem;letter-spacing:1px}
+h1{font-family:'Syne',sans-serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1rem}
+h1 span{background:linear-gradient(135deg,#7DF9FF,#4F8BFF,#B57BFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{color:rgba(255,255,255,0.55);font-size:1.1rem;max-width:520px;line-height:1.7;margin-bottom:2.5rem}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.btn-big{padding:0.85rem 2.2rem;border-radius:50px;font-size:1rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.3s}
+.btn-big-primary{background:linear-gradient(135deg,#4F8BFF,#B57BFF);border:none;color:#fff}
+.btn-big-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(79,139,255,0.4)}
+.btn-big-outline{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff}
+.stats{display:flex;gap:3rem;margin-top:4rem;flex-wrap:wrap;justify-content:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,#7DF9FF,#4F8BFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:4px;text-align:center}
+#pricing{min-height:100vh;padding:5rem 2rem;display:none;flex-direction:column;align-items:center}
+#pricing.active{display:flex}
+.section-title{font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;text-align:center;margin-bottom:0.5rem}
+.section-sub{color:rgba(255,255,255,0.45);text-align:center;margin-bottom:3rem}
+.pricing-toggle{display:flex;align-items:center;gap:1rem;margin-bottom:3rem}
+.toggle-label{color:rgba(255,255,255,0.6);font-size:0.9rem}
+.toggle{position:relative;width:52px;height:28px;cursor:pointer}
+.toggle input{display:none}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:50px;border:1px solid rgba(255,255,255,0.15);transition:0.3s}
+.toggle input:checked+.toggle-slider{background:linear-gradient(135deg,#4F8BFF,#B57BFF)}
+.toggle-slider:before{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:0.3s}
+.toggle input:checked+.toggle-slider:before{transform:translateX(24px)}
+.save-badge{background:rgba(125,249,255,0.1);border:1px solid rgba(125,249,255,0.25);color:#7DF9FF;font-size:0.75rem;padding:0.2rem 0.7rem;border-radius:50px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;width:100%;max-width:860px}
+.plan{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2rem;transition:all 0.3s;position:relative}
+.plan:hover{border-color:rgba(79,139,255,0.4);transform:translateY(-4px)}
+.plan.featured{border-color:rgba(79,139,255,0.5);background:rgba(79,139,255,0.08)}
+.plan-badge{position:absolute;top:1rem;right:1rem;background:linear-gradient(135deg,#4F8BFF,#B57BFF);color:#fff;font-size:0.7rem;padding:0.25rem 0.7rem;border-radius:50px}
+.plan-name{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem}
+.plan-price{font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;margin:1rem 0 0.25rem}
+.plan-price span{font-size:1rem;font-weight:400;color:rgba(255,255,255,0.45)}
+.plan-period{color:rgba(255,255,255,0.4);font-size:0.82rem;margin-bottom:1.5rem}
+.plan-features{list-style:none;margin-bottom:2rem}
+.plan-features li{color:rgba(255,255,255,0.7);font-size:0.88rem;padding:0.4rem 0;display:flex;align-items:center;gap:8px}
+.plan-features li:before{content:'';width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,#7DF9FF,#4F8BFF);flex-shrink:0}
+.plan-btn{width:100%;padding:0.8rem;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.3s}
+#auth{min-height:100vh;display:none;align-items:center;justify-content:center;padding:2rem}
+#auth.active{display:flex}
+.auth-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:2.5rem;width:100%;max-width:420px}
+.auth-title{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:0.4rem}
+.auth-sub{color:rgba(255,255,255,0.45);font-size:0.88rem;margin-bottom:2rem}
+.form-group{margin-bottom:1.2rem}
+.form-label{font-size:0.82rem;color:rgba(255,255,255,0.6);margin-bottom:0.4rem;display:block}
+.form-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:0.8rem 1rem;color:#fff;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:border 0.3s}
+.form-input:focus{border-color:#4F8BFF}
+.form-input::placeholder{color:rgba(255,255,255,0.25)}
+.auth-submit{width:100%;padding:0.9rem;background:linear-gradient(135deg,#4F8BFF,#B57BFF);border:none;border-radius:50px;color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;cursor:pointer;margin-top:0.5rem}
+.auth-switch{text-align:center;margin-top:1.5rem;color:rgba(255,255,255,0.45);font-size:0.85rem}
+.auth-switch a{color:#7DF9FF;cursor:pointer}
+#dashboard{min-height:100vh;display:none;padding:2rem;max-width:1100px;margin:0 auto}
+#dashboard.active{display:block}
+.dash-title{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800}
+.dash-sub{color:rgba(255,255,255,0.45);margin-top:0.3rem;margin-bottom:2rem}
+.dash-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:1.5rem}
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:1.8rem}
+.card-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:1.2rem}
+textarea.form-input{resize:none;min-height:100px}
+select.form-input option{background:#0d1b2e}
+.generate-btn{width:100%;padding:1rem;background:linear-gradient(135deg,#4F8BFF,#B57BFF);border:none;border-radius:14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;cursor:pointer;margin-top:1rem;transition:all 0.3s}
+.generate-btn:disabled{opacity:0.5;cursor:not-allowed}
+.output-area{min-height:300px;background:rgba(0,0,0,0.2);border-radius:14px;padding:1.2rem;font-size:0.88rem;line-height:1.8;color:rgba(255,255,255,0.8);white-space:pre-wrap;overflow-y:auto;max-height:450px}
+.output-placeholder{color:rgba(255,255,255,0.2);text-align:center;margin-top:80px;font-size:0.9rem}
+.download-btn{width:100%;padding:0.8rem;background:rgba(125,249,255,0.1);border:1px solid rgba(125,249,255,0.25);border-radius:14px;color:#7DF9FF;font-family:'DM Sans',sans-serif;font-size:0.88rem;cursor:pointer;margin-top:1rem}
+.download-btn:disabled{opacity:0.3;cursor:not-allowed}
+.chat-area{display:flex;flex-direction:column;height:380px}
+.chat-messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:1rem}
+.msg{max-width:80%;padding:0.7rem 1rem;border-radius:16px;font-size:0.85rem;line-height:1.6}
+.msg.user{align-self:flex-end;background:linear-gradient(135deg,#4F8BFF,#B57BFF);color:#fff}
+.msg.ai{align-self:flex-start;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85)}
+.chat-input-row{display:flex;gap:8px}
+.chat-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:50px;padding:0.7rem 1.1rem;color:#fff;font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none}
+.chat-send{background:linear-gradient(135deg,#4F8BFF,#B57BFF);border:none;border-radius:50px;padding:0.7rem 1.2rem;color:#fff;cursor:pointer;font-size:0.85rem;font-weight:500}
+.typing{color:rgba(255,255,255,0.35);font-size:0.8rem;padding:0.5rem;font-style:italic}
+.user-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:50px;padding:0.35rem 0.8rem;font-size:0.82rem}
+.user-dot{width:8px;height:8px;border-radius:50%;background:#7DF9FF}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="app">
+<nav>
+  <div class="logo">AalaAI</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div id="userPill" style="display:none" class="user-pill"><div class="user-dot"></div><span id="userEmail">user</span></div>
+    <button class="btn-outline" onclick="showSection('pricing')">Pricing</button>
+    <button class="btn-outline" id="loginNavBtn" onclick="showAuth('login')">Log in</button>
+    <button class="btn-primary" id="signupNavBtn" onclick="showAuth('signup')">Sign up</button>
+    <button class="btn-outline" id="logoutBtn" style="display:none" onclick="logout()">Log out</button>
+  </div>
+</nav>
+
+<section id="hero" class="active">
+  <div class="badge">AI-POWERED BUSINESS PLANNING</div>
+  <h1>Turn Your Idea Into<br>A <span>Business Plan</span><br>In Seconds</h1>
+  <p class="hero-sub">AalaAI uses advanced AI to generate complete, professional business plans instantly. Used by entrepreneurs in 50+ countries.</p>
+  <div class="hero-btns">
+    <button class="btn-big btn-big-primary" onclick="showAuth('signup')">Start for Free</button>
+    <button class="btn-big btn-big-outline" onclick="showSection('pricing')">See Pricing</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">10K+</div><div class="stat-label">Plans Generated</div></div>
+    <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Countries</div></div>
+    <div class="stat"><div class="stat-num">98%</div><div class="stat-label">Satisfaction</div></div>
+    <div class="stat"><div class="stat-num">2min</div><div class="stat-label">Average Time</div></div>
+  </div>
+</section>
+
+<section id="pricing">
+  <h2 class="section-title">Simple, Honest Pricing</h2>
+  <p class="section-sub">Start free, upgrade when ready</p>
+  <div class="pricing-toggle">
+    <span class="toggle-label">Monthly</span>
+    <label class="toggle"><input type="checkbox" id="yearlyToggle" onchange="togglePricing()"><div class="toggle-slider"></div></label>
+    <span class="toggle-label">Yearly</span>
+    <span class="save-badge">Save 40%</span>
+  </div>
+  <div class="plans">
+    <div class="plan">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">$0<span>/mo</span></div>
+      <div class="plan-period">Forever free</div>
+      <ul class="plan-features">
+        <li>3 business plans/month</li><li>Basic AI generation</li><li>TXT download</li><li>AI chat (10 msgs/day)</li><li>English only</li>
+      </ul>
+      <button class="plan-btn btn-outline" onclick="showAuth('signup')">Get Started</button>
+    </div>
+    <div class="plan featured">
+      <div class="plan-badge">Most Popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price" id="proPrice">$9<span>/mo</span></div>
+      <div class="plan-period" id="proPeriod">Billed monthly</div>
+      <ul class="plan-features">
+        <li>Unlimited business plans</li><li>Advanced AI generation</li><li>TXT download</li><li>Unlimited AI chat</li><li>10+ Languages</li><li>Financial projections</li><li>Priority support</li>
+      </ul>
+      <button class="plan-btn btn-primary" onclick="showAuth('signup')">Get Pro</button>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Business</div>
+      <div class="plan-price" id="bizPrice">$29<span>/mo</span></div>
+      <div class="plan-period" id="bizPeriod">Billed monthly</div>
+      <ul class="plan-features">
+        <li>Everything in Pro</li><li>5 team members</li><li>Custom branding</li><li>API access</li><li>Analytics dashboard</li><li>Dedicated support</li>
+      </ul>
+      <button class="plan-btn btn-outline" onclick="showAuth('signup')">Get Business</button>
+    </div>
+  </div>
+  <button class="btn-outline" onclick="showSection('hero')" style="margin-top:2rem">Back to Home</button>
+</section>
+
+<section id="auth">
+  <div class="auth-card">
+    <div id="loginForm">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Log in to your AalaAI account</div>
+      <div class="form-group"><label class="form-label">Email address</label><input class="form-input" type="email" id="loginEmail" placeholder="you@email.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPass" placeholder="Your password"></div>
+      <button class="auth-submit" onclick="doLogin()">Log In</button>
+      <div class="auth-switch">No account? <a onclick="showAuth('signup')">Sign up free</a></div>
+    </div>
+    <div id="signupForm" style="display:none">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Join thousands of entrepreneurs using AalaAI</div>
+      <div class="form-group"><label class="form-label">Full name</label><input class="form-input" type="text" id="signupName" placeholder="Your name"></div>
+      <div class="form-group"><label class="form-label">Email address</label><input class="form-input" type="email" id="signupEmail" placeholder="you@email.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="signupPass" placeholder="Create a password"></div>
+      <div class="form-group"><label class="form-label">Preferred language</label>
+        <select class="form-input" id="signupLang">
+          <option>English</option><option>Arabic</option><option>Spanish</option><option>French</option><option>Hindi</option><option>Sinhala</option><option>Tamil</option><option>Portuguese</option><option>German</option><option>Japanese</option>
+        </select>
+      </div>
+      <button class="auth-submit" onclick="doSignup()">Create Account</button>
+      <div class="auth-switch">Have account? <a onclick="showAuth('login')">Log in</a></div>
+    </div>
+  </div>
+</section>
+
+<section id="dashboard">
+  <div class="dash-title" id="dashTitle">Welcome to AalaAI</div>
+  <div class="dash-sub">Generate your professional business plan below</div>
+  <div class="dash-grid">
+    <div class="card">
+      <div class="card-title">Business Plan Generator</div>
+      <div class="form-group"><label class="form-label">Your business idea</label><textarea class="form-input" id="bizIdea" placeholder="e.g. An online store that sells handmade Sri Lankan crafts worldwide..."></textarea></div>
+      <div class="form-group"><label class="form-label">Industry</label>
+        <select class="form-input" id="bizIndustry">
+          <option>E-commerce</option><option>Technology</option><option>Food and Beverage</option><option>Health and Wellness</option><option>Education</option><option>Finance</option><option>Real Estate</option><option>Fashion</option><option>Travel and Tourism</option><option>Agriculture</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Target country or market</label><input class="form-input" id="bizCountry" placeholder="e.g. Sri Lanka, USA, Global..."></div>
+      <div class="form-group"><label class="form-label">Starting budget</label>
+        <select class="form-input" id="bizBudget">
+          <option>Under $1,000</option><option>$1,000 - $5,000</option><option>$5,000 - $20,000</option><option>$20,000 - $100,000</option><option>Over $100,000</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Output language</label>
+        <select class="form-input" id="bizLang">
+          <option>English</option><option>Arabic</option><option>Spanish</option><option>French</option><option>Hindi</option><option>Sinhala</option><option>Tamil</option><option>Portuguese</option><option>German</option><option>Japanese</option>
+        </select>
+      </div>
+      <button class="generate-btn" id="genBtn" onclick="generatePlan()"><span id="genBtnText">Generate Business Plan</span></button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1.5rem">
+      <div class="card">
+        <div class="card-title">Your Business Plan</div>
+        <div class="output-area" id="outputArea"><div class="output-placeholder">Your AI-generated business plan will appear here...</div></div>
+        <button class="download-btn" id="downloadBtn" disabled onclick="downloadPlan()">Download as TXT</button>
+      </div>
+      <div class="card">
+        <div class="card-title">AI Business Assistant</div>
+        <div class="chat-area">
+          <div class="chat-messages" id="chatMessages">
+            <div class="msg ai">Hi! I am your AalaAI business assistant. Ask me anything about business, marketing, finance or your plan!</div>
+          </div>
+          <div class="chat-input-row">
+            <input class="chat-input" id="chatInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="chat-send" onclick="sendChat()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<script>
+// ============================================
+// PASTE YOUR GROQ API KEY BELOW
+const GROQ_KEY = 'PASTE_YOUR_GROQ_KEY_HERE';
+// ============================================
+
+const GROQ_URL='https://api.groq.com/openai/v1/chat/completions';
+const MODEL='llama-3.3-70b-versatile';
+let currentUser=null,currentPlan='';
+
+function showSection(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showAuth(type){showSection('auth');document.getElementById('loginForm').style.display=type==='login'?'block':'none';document.getElementById('signupForm').style.display=type==='signup'?'block':'none';}
+function doLogin(){const e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPass').value;if(!e||!p){alert('Please fill all fields');return;}currentUser={email:e,name:e.split('@')[0]};onLogin();}
+function doSignup(){const n=document.getElementById('signupName').value.trim(),e=document.getElementById('signupEmail').value.trim(),p=document.getElementById('signupPass').value;if(!n||!e||!p){alert('Please fill all fields');return;}if(p.length<6){alert('Password must be at least 6 characters');return;}currentUser={email:e,name:n};onLogin();}
+function onLogin(){document.getElementById('userPill').style.display='flex';document.getElementById('userEmail').textContent=currentUser.name;document.getElementById('loginNavBtn').style.display='none';document.getElementById('signupNavBtn').style.display='none';document.getElementById('logoutBtn').style.display='block';document.getElementById('dashTitle').textContent='Welcome, '+currentUser.name+' !';showSection('dashboard');}
+function logout(){currentUser=null;document.getElementById('userPill').style.display='none';document.getElementById('loginNavBtn').style.display='block';document.getElementById('signupNavBtn').style.display='block';document.getElementById('logoutBtn').style.display='none';showSection('hero');}
+function togglePricing(){const y=document.getElementById('yearlyToggle').checked;document.getElementById('proPrice').innerHTML=y?'$65<span>/yr</span>':'$9<span>/mo</span>';document.getElementById('proPeriod').textContent=y?'Billed yearly (save 40%)':'Billed monthly';document.getElementById('bizPrice').innerHTML=y?'$199<span>/yr</span>':'$29<span>/mo</span>';document.getElementById('bizPeriod').textContent=y?'Billed yearly (save 40%)':'Billed monthly';}
+async function generatePlan(){
+  const idea=document.getElementById('bizIdea').value.trim();
+  if(!idea){alert('Please enter your business idea first!');return;}
+  const industry=document.getElementById('bizIndustry').value,country=document.getElementById('bizCountry').value||'Global',budget=document.getElementById('bizBudget').value,lang=document.getElementById('bizLang').value;
+  const btn=document.getElementById('genBtn'),btnText=document.getElementById('genBtnText');
+  btn.disabled=true;btnText.innerHTML='<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:8px"></span>Generating...';
+  document.getElementById('outputArea').innerHTML='<div class="output-placeholder">AI is writing your business plan...</div>';
+  document.getElementById('downloadBtn').disabled=true;
+  try{
+    const res=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},body:JSON.stringify({model:MODEL,messages:[{role:'user',content:`Create a complete professional business plan in ${lang}.\nBusiness Idea: ${idea}\nIndustry: ${industry}\nTarget Market: ${country}\nBudget: ${budget}\n\nInclude: 1.Executive Summary 2.Business Description 3.Market Analysis 4.Target Customers 5.Products and Services 6.Marketing Strategy 7.Financial Plan 8.Operations Plan 9.SWOT Analysis 10.Action Plan\n\nBe specific and practical.`}],max_tokens:2500,temperature:0.7})});
+    const data=await res.json();
+    if(data.choices&&data.choices[0]){currentPlan=data.choices[0].message.content;document.getElementById('outputArea').textContent=currentPlan;document.getElementById('downloadBtn').disabled=false;}
+    else{document.getElementById('outputArea').innerHTML='<div class="output-placeholder">Error. Check your API key in the code.</div>';}
+  }catch(e){document.getElementById('outputArea').innerHTML='<div class="output-placeholder">Connection error. Please try again.</div>';}
+  btn.disabled=false;btnText.textContent='Generate Business Plan';
+}
+async function sendChat(){
+  const input=document.getElementById('chatInput'),msg=input.value.trim();
+  if(!msg)return;input.value='';
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML+=`<div class="msg user">${msg}</div><div class="typing" id="typing">AalaAI is typing...</div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  try{
+    const res=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},body:JSON.stringify({model:MODEL,messages:[{role:'user',content:`You are AalaAI business assistant.${currentPlan?` User plan context: ${currentPlan.substring(0,300)}...`:''}\nUser: ${msg}\nGive helpful, friendly, concise business advice.`}],max_tokens:500,temperature:0.7})});
+    const data=await res.json();
+    document.getElementById('typing')?.remove();
+    msgs.innerHTML+=`<div class="msg ai">${data.choices&&data.choices[0]?data.choices[0].message.content:'Sorry, try again.'}</div>`;
+  }catch(e){document.getElementById('typing')?.remove();msgs.innerHTML+=`<div class="msg ai">Connection error. Try again.</div>`;}
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function downloadPlan(){if(!currentPlan)return;const b=new Blob([currentPlan],{type:'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='AalaAI_BusinessPlan.txt';a.click();URL.revokeObjectURL(u);}
+
+// 3D BACKGROUND
+const canvas=document.getElementById('bg'),ctx=canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+const colors=['#7DF9FF','#4F8BFF','#B57BFF','#ffffff'];
+for(let i=0;i<180;i++)particles.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,z:Math.random()*800+200,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,vz:-0.5-Math.random()*0.5,r:Math.floor(Math.random()*4)});
+let mouse={x:0,y:0};
+window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+function drawFrame(){
+  ctx.fillStyle='rgba(5,10,20,0.18)';ctx.fillRect(0,0,W,H);
+  const cx=W/2,cy=H/2,dx=(mouse.x-cx)/(cx||1),dy=(mouse.y-cy)/(cy||1);
+  particles.forEach(p=>{
+    p.z+=p.vz;p.x+=p.vx+dx*0.5;p.y+=p.vy+dy*0.5;
+    if(p.z<1){p.z=800;p.x=Math.random()*W;p.y=Math.random()*H;}
+    if(p.x<0||p.x>W||p.y<0||p.y>H){p.x=Math.random()*W;p.y=Math.random()*H;p.z=800;}
+    const scale=400/(400+p.z),px=cx+(p.x-cx)*scale,py=cy+(p.y-cy)*scale;
+    ctx.globalAlpha=Math.min(1,scale*1.5);ctx.fillStyle=colors[p.r];
+    ctx.beginPath();ctx.arc(px,py,Math.max(0.3,scale*2.5),0,Math.PI*2);ctx.fill();
+  });
+  ctx.globalAlpha=1;requestAnimationFrame(drawFrame);
+}
+drawFrame();
+</script>
+</body>
+</html>
